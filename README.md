@@ -1,0 +1,1 @@
+I built a simple API that fetches and displays the "Astronomy Picture of the Day" using NASA's APOD API. This project helped me understand how to make API calls, handle JSON data, and manage asynchronous operations. 
