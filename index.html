@@ -1,25 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>NASA APOD Viewer</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NASA Astronomy Picture of the Day</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 2rem;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        h1, h2 {
+            color: #ccc;
+        }
+        img, iframe {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #555;
+            margin-top: 1rem;
+        }
+        p {
+            line-height: 1.6;
+            text-align: left;
+        }
+        .copyright {
+            color: #888;
+            margin-top: 1rem;
+        }
+    </style>
 </head>
 <body>
-    <header>
+
+    <div class="container">
         <h1>Astronomy Picture of the Day</h1>
-    </header>
-    <main>
+
         <div id="apod-container">
-            <h2 id="apod-title"></h2>
-            <img id="apod-image" src="" alt="Astronomy Picture of the Day">
+            <h2 id="apod-title">Loading...</h2>
+            
+            <img id="apod-image" style="display:none;" alt="Astronomy Picture of the Day">
+
+            <iframe id="apod-video" frameborder="0" allow="fullscreen;" style="display:none; width: 100%; height: 450px;"></iframe>
+
             <p id="apod-explanation"></p>
             <p class="copyright"></p>
         </div>
-    </main>
-    <footer>
-        <p>Data from NASA's free APIs</p>
-    </footer>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        const apiKey = "zRNScBD8ppgIVvGP8BtQcRFmzj1ETH4ztKtwKyii";
+        const url = `https://api.nasa.gov/planetary/apod?api_key=${apiKey}`;
+
+        fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data); // Optional: See the full data in your console
+
+            const apodImage = document.getElementById('apod-image');
+            const apodVideo = document.getElementById('apod-video');
+            
+            // Check the media type to decide what to display
+            if (data.media_type === 'image') {
+                apodImage.src = data.url;
+                apodImage.alt = data.title;
+                apodImage.style.display = 'block'; // Show the image
+                apodVideo.style.display = 'none'; // Hide the video
+            } else if (data.media_type === 'video') {
+                apodVideo.src = data.url;
+                apodVideo.style.display = 'block'; // Show the video
+                apodImage.style.display = 'none'; // Hide the image
+            }
+
+            document.getElementById('apod-title').textContent = data.title;
+            document.getElementById('apod-explanation').textContent = data.explanation;
+            
+            if (data.copyright) {
+                document.querySelector('.copyright').textContent = `© ${data.copyright}`;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            document.getElementById('apod-container').innerHTML = `<p style="color: red;">Failed to load data. Please check your API key and try again.</p>`;
+        });
+    </script>
 </body>
 </html>
